@@ -64,6 +64,7 @@ def moveAllJavaFiles(path, location):
 		if file.endswith(".java"):
 			shutil.move(file, location)
 
+
 '''
 Checks to see if a class file exists in a given dir.
 Returns True if one of the files in the given dir is a class file.
