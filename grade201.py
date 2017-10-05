@@ -64,7 +64,6 @@ def moveAllJavaFiles(path, location):
 		if file.endswith(".java"):
 			shutil.move(file, location)
 
-
 '''
 Checks to see if a class file exists in a given dir.
 Returns True if one of the files in the given dir is a class file.
@@ -106,7 +105,6 @@ def runJavaPrograms(files, assignment_name):
 	for file in files:
 		#Print out whose file it is.
 		print "\nThe following file is " + file + "\n\n"
-
 		#Change the name of file to a valid name so it compiles properly.
 		java_file = assignment_name + ".java"
 		shutil.move("Assignments/" + file, "./" + java_file)
@@ -115,8 +113,14 @@ def runJavaPrograms(files, assignment_name):
 
 		#Run it and then add a comment about the assignment.
 		if classFileExists(assignment_name):
-			#Run the class file.
-			system("java " + assignment_name)
+			run_again = False
+			while not run_again:
+				#Run the class file.
+				system("java " + assignment_name)
+				#check to see if grader wants to run the file again.
+				again = raw_input("\nRun again(Y/N)? ")
+				if again.lower() == "n":
+					run_again = True
 
 			#Remove the class file after it is run.
 			#move the java program back to its original dir.
@@ -125,7 +129,7 @@ def runJavaPrograms(files, assignment_name):
 
 			#Ask grader to write comment about file.
 			#Write the comment to output.log file.
-			comment = raw_input("Enter a comment about the assingment: ")
+			comment = raw_input("Enter a comment about the assignment: ")
 			with open("output.log", "a") as log_file:
 				log_file.write("\nComment for " + file +":\n\t" + comment + "\n")		
 
