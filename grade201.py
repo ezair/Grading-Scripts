@@ -85,13 +85,11 @@ Parameters: none.
 return type: string (filename given by the user)
 '''
 def nameOfAssignment():
-	filename = raw_input("Enter the filename for the assignment(Do NOT INCLUDE FILE EXTENTION): ")
+	filename = raw_input("Enter the name of the Assignment(Do NOT INCLUDE FILE EXTENTION): ")
 	if "." in filename:
 		print "Do Not Include The File Extention!"
 		nameOfAssignment()
-	else:
-		#system("clear")
-		return filename
+	return filename
 
 
 '''
@@ -143,7 +141,6 @@ def runJavaPrograms(files, assignment_name):
 
 #Main_____________________________________________________________________
 def main():
-
 	#Ask the grader for the name of the java assignment(without the file extention).
 	assignment_name = nameOfAssignment()
 
