@@ -14,7 +14,7 @@ Description:	This file grades 203 Hw Assignments.
 import os
 import shutil
 from os import system
-from pyunpack import Archive #run the below command in order to install this dependencies
+from pyunpack import Archive #run the below command in order to install this module.
 			     #sudo apt-get install pyunpack && sudo apt-get
 
 
