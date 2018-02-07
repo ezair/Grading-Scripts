@@ -4,177 +4,113 @@ File:	grade.py
 Description:	This file grades 203 Hw Assignments.
 				Make sure that you give this file the proper
 				name for grading(as in the proper assignment
-				name when prompted for it).
+				name when prompted for it) Do NOT include the 
+				file extension(.java).
 				IMPORTANT:
 							Make sure that this file is in the proper
-							folder. This script must be put into a folder
-							where all of the java files are.
+							folder. This script must be put into the folder
+							that contains the zip file of all student assignmnets
+							and the main program.
+							Do not have anything put the one zip file and this program
+							in that folder.
 '''
 
 import os
 import shutil
 from os import system
-from pyunpack import Archive #run the below command in order to install this module.
-			     #sudo apt-get install pyunpack && sudo apt-get
+from pyunpack import Archive	#run the following command in order to install the dependencies.
+								#sudo apt-get install pyunpack && sudo apt-get install patool
 
 
 '''
-This function returns a list string containing
-the name of all java files in a given path.
-Parameters: string path (path to java files).
-return type: list of strings (contains filenames).
+Get the name of the assingment the students
+are working on.
+Return type: String(name of the assignment)
 '''
-def getJavaFiles(path):
-	files = os.listdir(path)
-	for file in files:
-		if not file.endswith(".java"):
-			list.remove(file)
-	return files
-
+def getAssignmentName():
+	assignment_name = raw_input("Enter the name of the assignment(do not include the file extension): ")
+	if '.' in assignment_name:
+		print("DO NOT INCLUDE THE FILE EXTENSION")
+		return getAssignmentName()
+	return assignment_name
 
 
 '''
-Creates the required directories and files if they do not exist.
-The dirs required are (Graded/, Failed/, Assignments, and output.log)
-The function then moves all java files in the current dir to Assignments/
-parameters: none.
-return type: void.
+Unzip the folder from moodle that contains
+all of the student's assignments.
+After the extraction, delete the zip file.
+Return type: void
 '''
-def createRequirements():
-	if not os.path.exists("Failed/"):
-		os.makedirs("Failed/")
+def unzip():
+	#The zip folder downloaded from moodle that must be unziped
+	zip_file = ""
+	for file in os.listdir("."):
+		if ".zip" in file:
+			zip_file = file
+			break
+	Archive(zip_file).extractall(".")
+	#After unzipping the file, rm it from the directory.
 
-	if not os.path.exists("Graded/"):
-		os.makedirs("Graded/")
 
-	if not os.path.exists("Assignments/"):
-		os.makedirs("Assignments/")
-
+'''
+Create a log file that will be used to store comments
+about students assignments.
+Return type: void
+'''
+def createLogFile():
+	#log file that will be used to write comments about the users assignment.
 	if not os.path.exists("output.log"):
 		with open("output.log", "a") as log_file:
 			pass
 
 
-'''
-Move all java files in a given dir
-parameters: string path(Where you wanna grab the java file)
-			string location(Where you wanna move the java files)
-return type: void
-'''
-def moveAllJavaFiles(path, location):
-	for file in os.listdir(path):
-		if file.endswith(".java"):
-			shutil.move(file, location)
-
-
-'''
-Unzip all tar, tar.gz, .zip, .rar files in a given directory.
-parameters:	path (string: location of where you want the files to be extracted)
-return type: void
-'''
-def unzipAll(path):
-	for file in os.listdir(path):
-		if file.endswith(".zip") or file.endswith(".rar") or file.endswith(".gz") or file.endswith(".tar"):
-			Archive(file).extractall(path)
-		
-
-'''
-Checks to see if a class file exists in a given dir.
-Returns True if one of the files in the given dir is a class file.
-Parameters: string filename (name of the class file that we are looking for).
-return type: boolean
-'''
-def classFileExists(assignment_name):
-	classfile =  assignment_name + ".class"
-	return os.path.exists("./" + classfile)
-
-
-'''
-Ask the user for the name java file
-that is the assignment to be graded.
-file extention is not to be given.
-If the file extention is given, the function
-is recursively re-run.
-Parameters: none.
-return type: string (filename given by the user)
-'''
-def nameOfAssignment():
-	filename = raw_input("Enter the name of the Assignment(Do NOT INCLUDE FILE EXTENTION): ")
-	if "." in filename:
-		print "DO NOT Include The File Extention!"
-		nameOfAssignment()
-	return filename
-
-
-'''
-Run all java programs and check to see if they work.
-Prints out the name of the file above before running it.
-After the java program ends, user is prompted for comments.
-Comments are written to a file named "output.log"
-Parameters:	string files (path to where java files exists).
-'''
-def runJavaPrograms(files, assignment_name):
-	for file in files:
-		#Print out whose file it is.
-		print "\nThe following file is " + file + "\n\n"
-		#Change the name of file to a valid name so it compiles properly.
-		java_file = assignment_name + ".java"
-		shutil.move("Assignments/" + file, "./" + java_file)
-		#Compile the java program.
-		system("javac " + java_file)
-
-		#Run it and then add a comment about the assignment.
-		if classFileExists(assignment_name):
-			run_again = False
-			while not run_again:
-				#Run the class file.
-				system("java " + assignment_name)
-				#check to see if grader wants to run the file again.
-				again = raw_input("\nRun again(Y/N)? ")
-				if again.lower() == "n":
-					run_again = True
-
-			#Remove the class file after it is run.
-			#move the java program back to its original dir.
-			os.remove(assignment_name + ".class")
-			shutil.move(java_file, "Graded/" + file)
-
-			#Ask grader to write comment about file.
-			#Write the comment to output.log file.
-			comment = raw_input("Enter a comment about the assignment: ")
-			with open("output.log", "a") as log_file:
-				log_file.write("\nComment for " + file +":\n\t" + comment + "\n")		
-
-		#Write to log file, that assignment did not compile.
-		#move this file back to its name, and move it to Failed/.
-		else:
-			with open("output.log", "a") as log_file:
-				log_file.write("\n" + file + " \n\tdid not compile\n")
-			shutil.move(java_file, "Failed/" + file)
-
-
-#Main_____________________________________________________________________
+#------------------------------------------------------------------------------------------
 def main():
-	#Ask the grader for the name of the java assignment(without the file extention).
-	assignment_name = nameOfAssignment()
+	#grab the assignment name(without the file extension)
+	assignment_name = getAssignmentName()
 
-	#create all requirements for program to work.
-	createRequirements()
+	#Unzip the zip file to get assignments and then delete it after.
+	unzip()
 
-	#unzip all files in current dir.
-	unzipAll(".")
+	#Make a log file to store student assignmnet comments in.
+	createLogFile()
+
+	for folder in sorted(os.listdir(".")):
+		#get the zip file to extract and run
+		if os.path.isdir(folder):
+			zip_file = os.listdir(folder)[0]
+
+			print "it works here"
+			#extract each individual folder.
+			if (zip_file.endswith(".zip")) or (zip_file.endswith(".rar")) or (zip_file.endswith(".tar")) or (zip_file.endswith(".gz")):
+				Archive(folder + "/" + zip_file).extractall(".")
+
+				#run all of the java programs.
+				student_name = folder[0 : folder.index(',')]
+				print("The following assignment is " + student_name + "'s.\n\n")
+				
+				#compile java programs.
+				system("javac " + assignment_name + ".java")
+				
+				#if there is no class file, then it means that the program did not compile.
+				if assignment_name + ".class" not in os.listdir("."):
+					#write to the log file that the assignment did not compile.
+					with open("output.log", 'a') as log_file:
+						log_file.write(student_name + ":\n\t did not compile\n\n")
+					
+				#It Compiled. Run the java program
+				else:
+					system("java " + assignment_name)
+
+					#have grader write a comment about the assignment to the log_file
+					comment = raw_input("Grader's Comment: ")
+					with open("output.log", 'a') as log_file:
+						log_file.write(student_name + ":\n\t" + comment + "\n\n")
 	
-	#Move all of students java files to from here to Assignments/ dir.
-	moveAllJavaFiles(".", "Assignments/")
-
-	#Get a list of all java programs in the Assignments/ dir.
-	#Files are sorted.
-	files = sorted(getJavaFiles("Assignments/"))
-
-	#Run all of the students java programs.
-	runJavaPrograms(files, assignment_name)
+	#exit the program.
+	print("Have a nice day, Grader!")
 
 
-#Run main
+#Call main-----------------------------------------------------------------------------------
 if __name__ == "__main__":
-	main()
+    main()
